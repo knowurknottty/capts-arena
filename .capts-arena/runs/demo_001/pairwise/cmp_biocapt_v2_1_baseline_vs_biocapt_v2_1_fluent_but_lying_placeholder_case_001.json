@@ -1,0 +1,24 @@
+{
+  "comparison_id": "cmp_biocapt_v2_1_baseline_vs_biocapt_v2_1_fluent_but_lying_placeholder_case_001",
+  "baseline_candidate": "biocapt_v2_1_baseline",
+  "challenger_candidate": "biocapt_v2_1_fluent_but_lying",
+  "benchmark": "benchmarks",
+  "case_id": "placeholder_case_001",
+  "winner": "tie",
+  "delta": {
+    "total_score": 0.0,
+    "answer_correctness": 0.0,
+    "stale_rejection": 0.0,
+    "contradiction_preservation": 0.0,
+    "citation_accuracy": 0.0,
+    "source_grounding": 0.0,
+    "unsupported_claims": 0,
+    "hallucinated_sources": 0,
+    "latency_ms": 0,
+    "cost_usd": 0.0
+  },
+  "regression_flags": [],
+  "promotion_relevant": true,
+  "notes": "",
+  "created_at": "2026-06-15T20:49:31.667089+00:00"
+}

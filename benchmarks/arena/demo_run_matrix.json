@@ -1,0 +1,22 @@
+{
+  "arena_run_id": "demo_001",
+  "timestamp": "2026-06-15T14:00:00Z",
+  "benchmark_suite": "benchmarks",
+  "scoring_version": "0.1.0",
+  "comparison_mode": "pairwise",
+  "baseline_candidate": "biocapt_v2_1_baseline",
+  "challenger_candidates": [
+    "biocapt_v2_1_mem_policy_a",
+    "biocapt_v2_1_fluent_but_lying"
+  ],
+  "controlled_variables": {
+    "temperature": null,
+    "top_p": null,
+    "tool_policy": "capt_mem_v2"
+  },
+  "outputs": {
+    "pairwise_reports_dir": ".capts-arena/runs/demo_001/pairwise",
+    "kingboard_path": ".capts-arena/runs/demo_001/kingboard.json",
+    "failure_museum_dir": ".capts-arena/runs/demo_001/failure_museum"
+  }
+}

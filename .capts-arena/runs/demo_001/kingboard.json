@@ -1,0 +1,45 @@
+{
+  "kingboard_version": "0.1.0",
+  "kingboard_id": "kb_benchmarks_2_reports",
+  "created_at": "",
+  "benchmark_suite": "benchmarks",
+  "current_king": "biocapt_v2_1_baseline",
+  "rankings": [
+    {
+      "candidate_id": "biocapt_v2_1_baseline",
+      "arena_score": 0.0,
+      "win_rate": 0.0,
+      "wins": 0,
+      "losses": 0,
+      "ties": 2,
+      "invalid_runs": 0,
+      "critical_regressions": 0,
+      "promotion_status": "king",
+      "rank": 1
+    },
+    {
+      "candidate_id": "biocapt_v2_1_mem_policy_a",
+      "arena_score": 0.0,
+      "win_rate": 0.0,
+      "wins": 0,
+      "losses": 0,
+      "ties": 1,
+      "invalid_runs": 0,
+      "critical_regressions": 0,
+      "promotion_status": "challenger",
+      "rank": 2
+    },
+    {
+      "candidate_id": "biocapt_v2_1_fluent_but_lying",
+      "arena_score": 0.0,
+      "win_rate": 0.0,
+      "wins": 0,
+      "losses": 0,
+      "ties": 1,
+      "invalid_runs": 0,
+      "critical_regressions": 0,
+      "promotion_status": "challenger",
+      "rank": 3
+    }
+  ]
+}

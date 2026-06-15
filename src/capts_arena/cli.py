@@ -9,6 +9,7 @@ from .pairwise import compare_pair
 from .kingboard import build_kingboard
 from .failure_museum import export_failure_museum
 from .promotion_gate import decide_promotion
+from .bench_matrix import run_matrix as _run_matrix
 from . import __version__
 
 
@@ -63,6 +64,20 @@ def cmd_promote(args: argparse.Namespace) -> None:
     print(json.dumps(decision, indent=2))
 
 
+def cmd_bench_matrix(args: argparse.Namespace) -> None:
+    report = _run_matrix(args.matrix)
+    if args.out:
+        _dump_json(report, args.out)
+    # Print summary to stdout
+    print(f"Arena run: {report['arena_run_id']}")
+    print(f"Benchmark: {report['benchmark_suite']}")
+    print(f"King: {report['kingboard']['current_king']}")
+    print(f"Candidates: {report['kingboard']['rankings']} ranked")
+    print(f"Pairwise reports: {report['pairwise_count']}")
+    print(f"Failure museum: {report['failure_museum_entries']} entries")
+    print(f"Wrote: {args.out}")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(prog="capts-arena", description="Inversion Arena — CAPT delta benchmarking")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -86,6 +101,10 @@ def main() -> None:
     p_promote.add_argument("--kingboard", required=True)
     p_promote.add_argument("--pairwise-reports", required=True)
 
+    p_bm = sub.add_parser("bench-matrix")
+    p_bm.add_argument("matrix")
+    p_bm.add_argument("--out", default=".capts-arena/run_report.json")
+
     args = parser.parse_args()
 
     if args.command == "compare":
@@ -96,6 +115,8 @@ def main() -> None:
         cmd_museum(args)
     elif args.command == "promote":
         cmd_promote(args)
+    elif args.command == "bench-matrix":
+        cmd_bench_matrix(args)
 
 
 if __name__ == "__main__":

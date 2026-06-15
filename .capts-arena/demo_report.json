@@ -1,0 +1,67 @@
+{
+  "arena_run_id": "demo_001",
+  "benchmark_suite": "benchmarks",
+  "baseline_candidate": "biocapt_v2_1_baseline",
+  "challenger_candidates": [
+    "biocapt_v2_1_mem_policy_a",
+    "biocapt_v2_1_fluent_but_lying"
+  ],
+  "created_at": "2026-06-15T20:47:42.152376+00:00",
+  "candidate_results": {
+    "biocapt_v2_1_baseline": {
+      "cases_run": 1,
+      "cases_passed": 1,
+      "avg_score": 0.85
+    },
+    "biocapt_v2_1_mem_policy_a": {
+      "cases_run": 1,
+      "cases_passed": 1,
+      "avg_score": 0.85
+    },
+    "biocapt_v2_1_fluent_but_lying": {
+      "cases_run": 1,
+      "cases_passed": 1,
+      "avg_score": 0.85
+    }
+  },
+  "pairwise_count": 2,
+  "kingboard": {
+    "current_king": "biocapt_v2_1_baseline",
+    "rankings": 3,
+    "rankings_list": [
+      "biocapt_v2_1_baseline",
+      "biocapt_v2_1_mem_policy_a",
+      "biocapt_v2_1_fluent_but_lying"
+    ]
+  },
+  "failure_museum_entries": 0,
+  "promotions": [
+    {
+      "promotion_id": "promo_biocapt_v2_1_mem_policy_a_2026-06-15",
+      "candidate_id": "biocapt_v2_1_mem_policy_a",
+      "baseline_candidate": "biocapt_v2_1_baseline",
+      "decision": "needs_more_evidence",
+      "reason": "No head-to-head comparison with current king.",
+      "required_followups": [],
+      "supporting_reports": [],
+      "blocked_by": [],
+      "created_at": "2026-06-15T20:47:42.152350+00:00"
+    },
+    {
+      "promotion_id": "promo_biocapt_v2_1_fluent_but_lying_2026-06-15",
+      "candidate_id": "biocapt_v2_1_fluent_but_lying",
+      "baseline_candidate": "biocapt_v2_1_baseline",
+      "decision": "needs_more_evidence",
+      "reason": "No head-to-head comparison with current king.",
+      "required_followups": [],
+      "supporting_reports": [],
+      "blocked_by": [],
+      "created_at": "2026-06-15T20:47:42.152368+00:00"
+    }
+  ],
+  "outputs": {
+    "pairwise_reports_dir": ".capts-arena/runs/demo_001/pairwise",
+    "kingboard_path": ".capts-arena/runs/demo_001/kingboard.json",
+    "failure_museum_dir": ".capts-arena/runs/demo_001/failure_museum"
+  }
+}

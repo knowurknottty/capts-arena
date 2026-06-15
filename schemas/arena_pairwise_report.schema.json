@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "file:///schemas/arena_pairwise_report.schema.json",
+  "title": "ArenaPairwiseReport",
+  "description": "Side-by-side comparison report for two candidates on a single benchmark case.",
+  "type": "object",
+  "required": [
+    "comparison_id", "baseline_candidate", "challenger_candidate",
+    "benchmark", "case_id", "winner", "delta",
+    "regression_flags", "promotion_relevant"
+  ],
+  "properties": {
+    "comparison_id": { "type": "string" },
+    "baseline_candidate": { "type": "string" },
+    "challenger_candidate": { "type": "string" },
+    "benchmark": { "type": "string" },
+    "case_id": { "type": "string" },
+    "winner": {
+      "type": "string",
+      "enum": ["challenger", "baseline", "tie", "invalid"]
+    },
+    "delta": {
+      "type": "object",
+      "properties": {
+        "total_score": { "type": "number" },
+        "answer_correctness": { "type": "number" },
+        "stale_rejection": { "type": "number" },
+        "contradiction_preservation": { "type": "number" },
+        "citation_accuracy": { "type": "number" },
+        "source_grounding": { "type": "number" },
+        "unsupported_claims": { "type": "integer" },
+        "hallucinated_sources": { "type": "integer" },
+        "latency_ms": { "type": "integer" },
+        "cost_usd": { "type": "number" }
+      },
+      "required": ["total_score"]
+    },
+    "regression_flags": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "promotion_relevant": { "type": "boolean" },
+    "notes": { "type": "string" },
+    "created_at": { "type": "string", "format": "date-time" }
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "comparison_id": "cmp_baseline_vs_incompatible_manifest",
+  "baseline_candidate": "biocapt_v2_1_baseline",
+  "challenger_candidate": "biocapt_v2_1_bad_manifest",
+  "benchmark": "CAPT-MEM-3",
+  "case_id": "capt_mem_3_stale_rejection_001",
+  "winner": "invalid",
+  "delta": {
+    "total_score": 0.0,
+    "unsupported_claims": 0,
+    "hallucinated_sources": 0,
+    "latency_ms": 0,
+    "cost_usd": 0
+  },
+  "regression_flags": ["incompatible_run_manifests"],
+  "promotion_relevant": false,
+  "notes": "Run manifests incompatible: different scoring version, different benchmark hash. Comparison invalid.",
+  "created_at": "2026-06-15T12:10:00Z"
+}

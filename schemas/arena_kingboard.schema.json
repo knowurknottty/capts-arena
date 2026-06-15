@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "file:///schemas/arena_kingboard.schema.json",
+  "title": "ArenaKingboard",
+  "description": "Ranking of candidates by arena score with promotion status.",
+  "type": "object",
+  "required": ["kingboard_version", "current_king", "rankings"],
+  "properties": {
+    "kingboard_version": { "type": "string" },
+    "kingboard_id": { "type": "string" },
+    "created_at": { "type": "string", "format": "date-time" },
+    "benchmark_suite": { "type": "string" },
+    "current_king": { "type": "string" },
+    "rankings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "rank", "candidate_id", "arena_score",
+          "wins", "losses", "critical_regressions", "promotion_status"
+        ],
+        "properties": {
+          "rank": { "type": "integer", "minimum": 1 },
+          "candidate_id": { "type": "string" },
+          "arena_score": { "type": "number" },
+          "wins": { "type": "integer", "minimum": 0 },
+          "losses": { "type": "integer", "minimum": 0 },
+          "ties": { "type": "integer", "minimum": 0 },
+          "invalid_runs": { "type": "integer", "minimum": 0 },
+          "critical_regressions": { "type": "integer", "minimum": 0 },
+          "benchmark_coverage": { "type": "number" },
+          "promotion_status": {
+            "type": "string",
+            "enum": ["king", "challenger", "promoted", "rejected", "quarantined", "regressed", "insufficient_evidence"]
+          }
+        }
+      }
+    }
+  }
+}

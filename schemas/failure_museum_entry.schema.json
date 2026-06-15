@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "file:///schemas/failure_museum_entry.schema.json",
+  "title": "FailureMuseumEntry",
+  "description": "A preserved failure artifact from an arena run, used as training/eval curriculum.",
+  "type": "object",
+  "required": [
+    "museum_id", "case_id", "candidate_id",
+    "failure_type", "severity",
+    "expected_behavior", "observed_behavior"
+  ],
+  "properties": {
+    "museum_id": { "type": "string" },
+    "case_id": { "type": "string" },
+    "candidate_id": { "type": "string" },
+    "failure_type": {
+      "type": "string",
+      "enum": [
+        "missing_knowledge", "bad_retrieval", "bad_source_span",
+        "bad_dependency_order", "bad_temporal_reasoning",
+        "stale_memory_used", "contradiction_collapsed",
+        "unsupported_claim", "hallucinated_source",
+        "tool_use_failure", "answer_format_failure",
+        "confidence_miscalibration", "compression_loss",
+        "bubble_false_fact", "bubble_missing_constraint",
+        "adversarial_injection_accepted", "illegal_game_move",
+        "state_reconstruction_failure", "governance_violation"
+      ]
+    },
+    "severity": {
+      "type": "string",
+      "enum": ["low", "medium", "high", "critical"]
+    },
+    "expected_behavior": { "type": "string" },
+    "observed_behavior": { "type": "string" },
+    "trace_refs": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "source_refs": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "repair_recommendation": {
+      "type": "object",
+      "properties": {
+        "repair_type": {
+          "type": "string",
+          "enum": ["memory_policy", "bubble", "router", "prompt", "tool", "training", "governance"]
+        },
+        "description": { "type": "string" },
+        "candidate_bubble": { "type": "boolean" }
+      }
+    },
+    "regression": {
+      "type": "object",
+      "properties": {
+        "is_regression": { "type": "boolean" },
+        "baseline_candidate": { "type": "string" },
+        "baseline_behavior": { "type": "string" }
+      }
+    },
+    "museum_status": {
+      "type": "string",
+      "enum": ["open", "retested", "resolved", "quarantined"]
+    },
+    "created_at": { "type": "string", "format": "date-time" }
+  }
+}

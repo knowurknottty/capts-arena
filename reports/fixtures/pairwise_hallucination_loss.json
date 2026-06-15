@@ -1,0 +1,22 @@
+{
+  "comparison_id": "cmp_baseline_vs_score_higher_but_hallucinates",
+  "baseline_candidate": "biocapt_v2_1_baseline",
+  "challenger_candidate": "biocapt_v2_1_fluent_but_lying",
+  "benchmark": "CAPT-MEM-4",
+  "case_id": "capt_mem_4_contradiction_001",
+  "winner": "baseline",
+  "delta": {
+    "total_score": -0.15,
+    "contradiction_preservation": -0.40,
+    "citation_accuracy": -0.10,
+    "source_grounding": -0.05,
+    "unsupported_claims": 3,
+    "hallucinated_sources": 1,
+    "latency_ms": -50,
+    "cost_usd": -0.001
+  },
+  "regression_flags": ["hallucinated_sources_increased", "unsupported_claims_increased"],
+  "promotion_relevant": true,
+  "notes": "Challenger scored higher raw accuracy but hallucinated a source and collapsed a contradiction. Integrity failure dominates capability gain.",
+  "created_at": "2026-06-15T12:05:00Z"
+}

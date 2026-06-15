@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "file:///schemas/arena_candidate.schema.json",
+  "title": "ArenaCandidate",
+  "description": "A candidate organism state for the Inversion Arena. Candidates can be models, memory policies, bubble sets, router policies, prompt constitutions, tool policies, checkpoints, or composite agent stacks.",
+  "type": "object",
+  "required": [
+    "candidate_id",
+    "candidate_type",
+    "display_name",
+    "version",
+    "created_at"
+  ],
+  "properties": {
+    "candidate_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9_]+$"
+    },
+    "candidate_type": {
+      "type": "string",
+      "enum": ["model", "policy", "bubble_set", "router", "checkpoint", "agent_stack", "composite"]
+    },
+    "display_name": { "type": "string" },
+    "version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+    "created_at": { "type": "string", "format": "date-time" },
+    "base_candidate": { "type": ["string", "null"] },
+    "components": {
+      "type": "object",
+      "properties": {
+        "model": { "type": "string" },
+        "memory_policy": { "type": "string" },
+        "router_policy": { "type": "string" },
+        "bubble_set": { "type": "string" },
+        "prompt_policy": { "type": "string" },
+        "tool_policy": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+    "hashes": {
+      "type": "object",
+      "properties": {
+        "model_hash": { "type": ["string", "null"] },
+        "memory_state_hash": { "type": "string" },
+        "bubble_set_hash": { "type": "string" },
+        "config_hash": { "type": "string" }
+      },
+      "required": []
+    },
+    "allowed_tools": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "notes": { "type": "string" }
+  }
+}

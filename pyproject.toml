@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "capts-arena"
+version = "0.1.0"
+description = "Inversion Arena — CAPT delta benchmarking and recursive self-improvement"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = ["jsonschema>=4"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0"]
+
+[project.scripts]
+capts-arena = "capts_arena.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]

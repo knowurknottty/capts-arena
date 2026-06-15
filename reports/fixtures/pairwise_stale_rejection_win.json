@@ -1,0 +1,22 @@
+{
+  "comparison_id": "cmp_baseline_vs_policy_a_capt_mem_3",
+  "baseline_candidate": "biocapt_v2_1_baseline",
+  "challenger_candidate": "biocapt_v2_1_mem_policy_a",
+  "benchmark": "CAPT-MEM-3",
+  "case_id": "capt_mem_3_stale_rejection_001",
+  "winner": "challenger",
+  "delta": {
+    "total_score": 0.18,
+    "stale_rejection": 0.40,
+    "citation_accuracy": 0.10,
+    "source_grounding": 0.08,
+    "unsupported_claims": -1,
+    "hallucinated_sources": 0,
+    "latency_ms": 142,
+    "cost_usd": 0.002
+  },
+  "regression_flags": [],
+  "promotion_relevant": true,
+  "notes": "Challenger correctly rejected stale policy; baseline reused deprecated node.",
+  "created_at": "2026-06-15T12:00:00Z"
+}

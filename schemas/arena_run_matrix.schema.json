@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "file:///schemas/arena_run_matrix.schema.json",
+  "title": "ArenaRunMatrix",
+  "description": "Defines a structured arena comparison run: who fights whom, on what benchmark, under what controls.",
+  "type": "object",
+  "required": [
+    "arena_run_id",
+    "benchmark_suite",
+    "scoring_version",
+    "baseline_candidate",
+    "challenger_candidates"
+  ],
+  "properties": {
+    "arena_run_id": { "type": "string" },
+    "timestamp": { "type": "string", "format": "date-time" },
+    "benchmark_suite": { "type": "string" },
+    "case_filter": { "type": "string", "default": "all" },
+    "scoring_version": { "type": "string" },
+    "comparison_mode": {
+      "type": "string",
+      "enum": ["pairwise", "all_vs_all", "king_defense"]
+    },
+    "baseline_candidate": { "type": "string" },
+    "challenger_candidates": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1
+    },
+    "controlled_variables": {
+      "type": "object",
+      "properties": {
+        "temperature": { "type": ["number", "null"] },
+        "top_p": { "type": ["number", "null"] },
+        "tool_policy": { "type": "string" },
+        "memory_snapshot": { "type": "string" },
+        "benchmark_cases": { "type": "string" },
+        "scorer": { "type": "string" }
+      }
+    },
+    "outputs": {
+      "type": "object",
+      "properties": {
+        "pairwise_reports_dir": { "type": "string" },
+        "kingboard_path": { "type": "string" },
+        "failure_museum_dir": { "type": "string" }
+      }
+    }
+  }
+}

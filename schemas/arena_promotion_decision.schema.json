@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "file:///schemas/arena_promotion_decision.schema.json",
+  "title": "ArenaPromotionDecision",
+  "description": "Decision record for promoting or rejecting a challenger candidate.",
+  "type": "object",
+  "required": ["candidate_id", "baseline_candidate", "decision", "reason"],
+  "properties": {
+    "promotion_id": { "type": "string" },
+    "arena_run_id": { "type": "string" },
+    "candidate_id": { "type": "string" },
+    "baseline_candidate": { "type": "string" },
+    "decision": {
+      "type": "string",
+      "enum": ["promote", "reject", "quarantine", "needs_more_evidence"]
+    },
+    "reason": { "type": "string" },
+    "required_followups": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "supporting_reports": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "blocked_by": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "created_at": { "type": "string", "format": "date-time" }
+  }
+}

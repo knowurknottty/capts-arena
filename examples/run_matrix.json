@@ -1,0 +1,18 @@
+{
+  "arena_run_id": "example_public_redacted",
+  "benchmark_suite": "CAPT-MEM-3",
+  "scoring_version": "capt-context-scorer-0.1.0",
+  "baseline_candidate": "biocapt_v2_1_baseline",
+  "challenger_candidates": [
+    "challenger_clean",
+    "challenger_regressed"
+  ],
+  "candidate_reports": {
+    "biocapt_v2_1_baseline": "examples/reports/baseline.json",
+    "challenger_clean": "examples/reports/challenger_clean.json",
+    "challenger_regressed": "examples/reports/challenger_regressed.json"
+  },
+  "outputs": {
+    "run_root": ".capts-arena/runs/example_public_redacted"
+  }
+}

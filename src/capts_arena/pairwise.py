@@ -1,9 +1,8 @@
 from __future__ import annotations
 
-import json
-from pathlib import Path
 from typing import Any
 
+from .score_report import CANONICAL_DIMENSIONS, normalize_score_report, utc_now
 
 CRITICAL_REGRESSIONS = {
     "hallucinated_sources_increased",
@@ -13,108 +12,118 @@ CRITICAL_REGRESSIONS = {
     "governance_violation_increased",
 }
 
+DIMENSION_REGRESSION_LIMIT = -0.05
+WIN_THRESHOLD = 0.05
 
-def compare_pair(baseline: dict, challenger: dict) -> dict:
+
+def compare_pair(baseline: dict[str, Any], challenger: dict[str, Any]) -> dict[str, Any]:
+    """Compare two candidate case reports.
+
+    Integrity dominates fluency: a challenger with a higher raw score still loses
+    if it introduces critical regressions such as hallucinated sources,
+    unsupported claims, stale memory reuse, contradiction collapse, or governance
+    violations.
     """
-    Compare two candidate score reports and produce a pairwise delta report.
+    baseline_n = normalize_score_report(baseline)
+    challenger_n = normalize_score_report(challenger)
 
-    Parameters
-    ----------
-    baseline : dict
-        Score report for the baseline candidate.
-    challenger : dict
-        Score report for the challenger candidate.
-
-    Returns
-    -------
-    dict
-        Pairwise comparison report with delta, winner, and regression flags.
-    """
-    # Validate manifest compatibility
-    regression_flags: list[str] = []
-    manifest_compatible = _check_manifest_compatibility(baseline, challenger)
-
+    manifest_compatible, reason = _check_manifest_compatibility(baseline_n, challenger_n)
     if not manifest_compatible:
-        return _invalid_report(baseline, challenger, "incompatible_run_manifests")
+        return _invalid_report(baseline_n, challenger_n, reason)
 
-    # Compute raw delta on every dimension
     delta: dict[str, Any] = {
-        "total_score": _float_diff(baseline, challenger, "total_score"),
-        "answer_correctness": _float_diff(baseline, challenger, "answer_correctness"),
-        "stale_rejection": _float_diff(baseline, challenger, "stale_rejection"),
-        "contradiction_preservation": _float_diff(baseline, challenger, "contradiction_preservation"),
-        "citation_accuracy": _float_diff(baseline, challenger, "citation_accuracy"),
-        "source_grounding": _float_diff(baseline, challenger, "source_grounding"),
-        "unsupported_claims": _int_diff(baseline, challenger, "unsupported_claims"),
-        "hallucinated_sources": _int_diff(baseline, challenger, "hallucinated_sources"),
-        "latency_ms": _int_diff(baseline, challenger, "latency_ms"),
-        "cost_usd": _float_diff(baseline, challenger, "cost_usd"),
+        "total_score": _round(challenger_n["total_score"] - baseline_n["total_score"]),
+        "latency_ms": int(challenger_n["latency_ms"] - baseline_n["latency_ms"]),
+        "cost_usd": _round(challenger_n["cost_usd"] - baseline_n["cost_usd"], 6),
     }
 
-    # Detect regressions
-    if delta.get("hallucinated_sources", 0) > 0:
-        regression_flags.append("hallucinated_sources_increased")
-    if delta.get("unsupported_claims", 0) > 0:
-        regression_flags.append("unsupported_claims_increased")
+    for dimension in CANONICAL_DIMENSIONS:
+        delta[dimension] = _round(challenger_n["dimensions"].get(dimension, 0.0) - baseline_n["dimensions"].get(dimension, 0.0))
 
-    # Determine winner
-    has_critical = any(f in CRITICAL_REGRESSIONS for f in regression_flags)
-    delta_total = delta.get("total_score", 0.0)
+    for count_key in ("unsupported_claims", "hallucinated_sources"):
+        delta[count_key] = int(challenger_n["counts"].get(count_key, 0) - baseline_n["counts"].get(count_key, 0))
+
+    regression_flags = _regression_flags(baseline_n, challenger_n, delta)
+    has_critical = any(flag in CRITICAL_REGRESSIONS for flag in regression_flags)
 
     if has_critical:
-        if delta_total > 0:
-            # Has a critical regression but higher score — baseline wins (integrity > capability)
-            winner = "baseline"
-        elif delta_total < 0:
-            winner = "baseline"
-        else:
-            winner = "baseline"
-    elif delta_total > 0.05:
+        winner = "baseline"
+    elif delta["total_score"] > WIN_THRESHOLD:
         winner = "challenger"
-    elif delta_total < -0.05:
+    elif delta["total_score"] < -WIN_THRESHOLD:
         winner = "baseline"
     else:
         winner = "tie"
 
-    # Decide if this comparison is relevant for promotion
-    promotion_relevant = winner != "invalid" and not manifest_compatible is False  # noqa: E712
-
     return {
-        "comparison_id": f"cmp_{baseline.get('candidate_id', 'baseline')}_vs_{challenger.get('candidate_id', 'challenger')}_{challenger.get('case_id', 'unknown')}",
-        "baseline_candidate": baseline.get("candidate_id", "baseline"),
-        "challenger_candidate": challenger.get("candidate_id", "challenger"),
-        "benchmark": baseline.get("benchmark", "unknown"),
-        "case_id": baseline.get("case_id", "unknown"),
+        "comparison_id": _comparison_id(baseline_n, challenger_n),
+        "baseline_candidate": baseline_n["candidate_id"],
+        "challenger_candidate": challenger_n["candidate_id"],
+        "benchmark": baseline_n["benchmark"],
+        "case_id": baseline_n["case_id"],
         "winner": winner,
         "delta": delta,
         "regression_flags": regression_flags,
-        "promotion_relevant": promotion_relevant,
+        "promotion_relevant": True,
         "notes": _generate_notes(winner, delta, regression_flags),
-        "created_at": baseline.get("created_at", ""),
+        "evidence_summary": {
+            "baseline_failures": baseline_n["failures"],
+            "challenger_failures": challenger_n["failures"],
+            "baseline_trace_refs": baseline_n["trace_refs"],
+            "challenger_trace_refs": challenger_n["trace_refs"],
+            "baseline_source_refs": baseline_n["source_refs"],
+            "challenger_source_refs": challenger_n["source_refs"],
+        },
+        "created_at": challenger_n.get("created_at") or utc_now(),
     }
 
 
-def _check_manifest_compatibility(baseline: dict, challenger: dict) -> bool:
-    """Check that two score reports come from compatible runs."""
-    b_scoring = baseline.get("scoring_version") or baseline.get("scoring", {}).get("scorer_version")
-    c_scoring = challenger.get("scoring_version") or challenger.get("scoring", {}).get("scorer_version")
-    if b_scoring and c_scoring and b_scoring != c_scoring:
-        return False
-
-    b_bench = baseline.get("benchmark")
-    c_bench = challenger.get("benchmark")
-    if b_bench and c_bench and b_bench != c_bench:
-        return False
-
-    b_case = baseline.get("case_id")
-    c_case = challenger.get("case_id")
-    if b_case and c_case and b_case != c_case:
-        return False
-
-    return True
+def _check_manifest_compatibility(baseline: dict[str, Any], challenger: dict[str, Any]) -> tuple[bool, str]:
+    checks = (
+        ("scoring_version", "different scoring version"),
+        ("benchmark", "different benchmark"),
+        ("case_id", "different case id"),
+    )
+    for key, reason in checks:
+        b = baseline.get(key)
+        c = challenger.get(key)
+        if b and c and b != c:
+            return False, reason
+    return True, ""
 
 
-def _invalid_report(baseline: dict, challenger: dict, reason: str) -> dict:
+def _regression_flags(baseline: dict[str, Any], challenger: dict[str, Any], delta: dict[str, Any]) -> list[str]:
+    flags: list[str] = []
+
+    if delta.get("hallucinated_sources", 0) > 0:
+        flags.append("hallucinated_sources_increased")
+    if delta.get("unsupported_claims", 0) > 0:
+        flags.append("unsupported_claims_increased")
+
+    count_deltas = {
+        "stale_memory_uses": "stale_memory_regression",
+        "contradiction_collapses": "contradiction_collapse_regression",
+        "governance_violations": "governance_violation_increased",
+    }
+    for count_key, flag in count_deltas.items():
+        before = int(baseline["counts"].get(count_key, 0))
+        after = int(challenger["counts"].get(count_key, 0))
+        if after > before:
+            flags.append(flag)
+
+    if delta.get("stale_rejection", 0.0) < DIMENSION_REGRESSION_LIMIT and "stale_memory_regression" not in flags:
+        flags.append("stale_memory_regression")
+    if delta.get("contradiction_preservation", 0.0) < DIMENSION_REGRESSION_LIMIT and "contradiction_collapse_regression" not in flags:
+        flags.append("contradiction_collapse_regression")
+    if delta.get("source_grounding", 0.0) < DIMENSION_REGRESSION_LIMIT:
+        flags.append("source_grounding_regression")
+    if delta.get("citation_accuracy", 0.0) < DIMENSION_REGRESSION_LIMIT:
+        flags.append("citation_accuracy_regression")
+
+    return flags
+
+
+def _invalid_report(baseline: dict[str, Any], challenger: dict[str, Any], reason: str) -> dict[str, Any]:
     return {
         "comparison_id": f"cmp_invalid_{baseline.get('candidate_id', '?')}_vs_{challenger.get('candidate_id', '?')}",
         "baseline_candidate": baseline.get("candidate_id", "?"),
@@ -122,30 +131,42 @@ def _invalid_report(baseline: dict, challenger: dict, reason: str) -> dict:
         "benchmark": baseline.get("benchmark", "?"),
         "case_id": baseline.get("case_id", "?"),
         "winner": "invalid",
-        "delta": {"total_score": 0.0},
+        "delta": {
+            "total_score": 0.0,
+            "unsupported_claims": 0,
+            "hallucinated_sources": 0,
+            "latency_ms": 0,
+            "cost_usd": 0.0,
+        },
         "regression_flags": [f"incompatible_run_manifests: {reason}"],
         "promotion_relevant": False,
-        "notes": f"Run manifests incompatible: {reason}",
-        "created_at": baseline.get("created_at", ""),
+        "notes": f"Run manifests incompatible: {reason}.",
+        "created_at": utc_now(),
     }
 
 
-def _float_diff(b: dict, c: dict, key: str) -> float:
-    return float(c.get(key, 0) or 0) - float(b.get(key, 0) or 0)
+def _comparison_id(baseline: dict[str, Any], challenger: dict[str, Any]) -> str:
+    return (
+        f"cmp_{baseline.get('candidate_id', 'baseline')}"
+        f"_vs_{challenger.get('candidate_id', 'challenger')}"
+        f"_{baseline.get('case_id', 'unknown')}"
+    )
 
 
-def _int_diff(b: dict, c: dict, key: str) -> int:
-    return int(c.get(key, 0) or 0) - int(b.get(key, 0) or 0)
-
-
-def _generate_notes(winner: str, delta: dict, flags: list[str]) -> str:
-    if winner == "invalid":
-        return "Run manifests incompatible. Comparison invalid."
-    parts = []
+def _generate_notes(winner: str, delta: dict[str, Any], flags: list[str]) -> str:
+    parts: list[str] = []
     if flags:
-        parts.append(f"Regressions: {', '.join(flags)}")
-    if winner == "baseline" and any("increased" in f for f in flags):
+        parts.append(f"Regressions: {', '.join(flags)}.")
+    if winner == "baseline" and any(flag in CRITICAL_REGRESSIONS for flag in flags):
         parts.append("Integrity failure dominates capability gain.")
-    if delta.get("total_score", 0) > 0.15:
-        parts.append("Strong positive delta.")
-    return " ".join(parts) if parts else ""
+    elif winner == "challenger":
+        parts.append("Challenger produced a meaningful positive delta with no critical regressions.")
+    elif winner == "tie":
+        parts.append("Delta is within tolerance; keep more evidence before promotion.")
+    if delta.get("total_score", 0.0) > 0.15:
+        parts.append("Strong positive raw delta.")
+    return " ".join(parts)
+
+
+def _round(value: float, places: int = 4) -> float:
+    return round(float(value), places)

@@ -1,0 +1,28 @@
+{
+  "reports": [
+    {
+      "candidate_id": "challenger_regressed",
+      "benchmark": "CAPT-MEM-3",
+      "case_id": "capt_mem_3_stale_rejection_001",
+      "scoring_version": "capt-context-scorer-0.1.0",
+      "scores": {
+        "total": 0.91,
+        "staleness_handling": 0.60,
+        "retrieval": 0.72,
+        "evidence_linking": 0.62,
+        "contradiction_handling": 0.76
+      },
+      "unsupported_claims": 2,
+      "hallucinated_sources": 1,
+      "latency_ms": 950,
+      "cost_usd": 0.0015,
+      "failures": [
+        {
+          "type": "hallucinated_source",
+          "severity": "critical",
+          "message": "Invented citation under pressure."
+        }
+      ]
+    }
+  ]
+}

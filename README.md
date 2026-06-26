@@ -21,7 +21,7 @@ This repo now contains a working Python package and CLI seed for the full Invers
 - public redacted example matrix and reports
 - tests / fixtures for the core integrity invariant
 
-Important public-repo note: do not commit secrets, private run logs, raw personal traces, biometric data, local paths, API keys, model weights, or proprietary benchmark cases here.
+Public repo note: keep secrets, raw logs, personal traces, local paths, credentials, model weights, and proprietary benchmark cases out of this repository.
 
 ## System flow
 
@@ -96,7 +96,7 @@ Check promotion:
 
 ```bash
 capts-arena promote \
-  --candidate challenger_clean \
+  --candidate-id challenger_clean \
   --kingboard .capts-arena/kingboard.json \
   --pairwise-reports .capts-arena/runs/example_public_redacted/pairwise
 ```
@@ -124,9 +124,9 @@ This is the core Arena invariant: integrity failures dominate capability gains.
 
 ## Next production integrations
 
-- Wire private benchmark suites from the validation repo.
+- Wire validation benchmark suites through the report-file contract.
 - Add signed run manifests and content hashes.
 - Add persistent kingboard history.
 - Add failure museum replay.
 - Add static Arena UI.
-- Add CI jobs and schema validation.
+- Add CI schema validation.
